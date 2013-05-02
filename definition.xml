@@ -143,6 +143,9 @@
 					displayChart(settings);
 				}
 				
+				function elementSort(arg1, arg2) {
+					return naturalSort(arg1.name, arg2.name);
+				}
 				
 				// Main Gadget Logic Start
 				function goodLoad(settings) {
@@ -154,6 +157,7 @@
 						
 						// fill in element drop down list
 						var optionsValues = '<select id="elementId">';			
+						data.sort(elementSort);
 						$.each(data, function() {
 							optionsValues += '<option value="' + this.id + '">' + this.name + '</option>';
 						});
