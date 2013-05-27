@@ -123,7 +123,7 @@
 
 					//save group name for now, just for demo purposes
 					var settings = {'entityId':entityId, 'chartType':radioId, 'entityName':entityName, 'refreshRate':refreshRate, 'showLegend': showLegend};
-					uptimeGadget.saveSettings(settings, onGoodSave, onBadAjax);
+					uptimeGadget.saveSettings(settings).then(onGoodSave, onBadAjax);
 				});
 				$("#cancelSettings").click(function(){
 					$("#widgetChart").show();
@@ -233,7 +233,7 @@
 				
 				// Always load these at the end
 				uptimeGadget.registerOnEditHandler(showEditPanel);
-				uptimeGadget.registerOnLoadHandler(function(){uptimeGadget.loadSettings(goodLoad, onBadAjax);});
+				uptimeGadget.registerOnLoadHandler(function(){uptimeGadget.loadSettings().then(goodLoad, onBadAjax);});
 				//uptimeGadget.registerOnUploadFile(function (e){});
 
 			});
