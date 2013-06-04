@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-  <ModulePrefs title="Element Status Panel">
-    <Require feature="dynamic-height"/>
-  </ModulePrefs>
-  <Content type="html">
+	<ModulePrefs title="Element Status Panel">
+		<Require feature="dynamic-height" />
+	</ModulePrefs>
+	<Content type="html">
 <![CDATA[ 
 
 <html lang="en">
@@ -12,40 +12,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 		<title>Current Status</title>
 		<link href="/styles/uptime.css" type="text/css" rel="stylesheet" />
-		<style>
-			#bigTableHeading {
-				padding: 7px;
-				font-align: center;
-				font-size: 130%;
-			}
-			td a {
-				padding: 3px;
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-			td.OK {
-				background-color: #67B10B;
-				color: #444;
-				font-align: center;
-			}
-			td.WARN {
-				background-color: #DAD60B;
-				color: #444;
-			}
-			td.CRIT {
-				background-color: #B61211;
-				color: #FFFFFF;
-			}
-			td.MAINT {
-				background-color: #555B98;
-				color: #FFFFFF;
-			}
-			td.UNKNOWN {
-				background-color: #AEAEAE;
-				color: #444;
-			}
-		</style>
+		<link href="__UPTIME_GADGET_BASE__/elementStatus.css" type="text/css" rel="stylesheet" />
 
 		#includeResources()
 		
@@ -243,5 +210,5 @@
 </html>
 
 ]]>
-  </Content> 
+	</Content>
 </Module>
