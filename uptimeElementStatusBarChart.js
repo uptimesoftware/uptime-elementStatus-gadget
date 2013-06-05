@@ -22,6 +22,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			var entityName = null;
 			var chartType = null;
 			var uptime_api = null;
+			var api = null;
 			var refreshRate = null;
 			var showLegend  = null;
 
@@ -33,6 +34,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				entityId    = options.entityId;
 				entityName  = options.entityName;
 				uptime_api  = options.uptime_api;
+				api = options.api;
 				refreshRate = options.refreshRate;
 				showLegend  = options.showLegend;
 			}
@@ -117,9 +119,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			});					  
    
 		function updateChart() {
-			uptime_api.getElementStatus(entityId,function(fullData) {
-				
-				//console.log(elementStatus);
+			api.getElementStatus(entityId).then(function(fullData) {
 				
 				var allMonitorsStatus = fullData['monitorStatus'];
 				var statusTally  = {};

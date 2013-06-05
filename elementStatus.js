@@ -1,6 +1,7 @@
 $(function() {
 	// uptimeApi
 	var uptime_api = new uptimeApi();
+	var api = new apiQueries();
 	var myChart = null;
 
 	$("#widgetSettings").hide();
@@ -61,11 +62,8 @@ $(function() {
 	function goodLoad(settings) {
 		var statusBar = $("#statusBar");
 
-		uptime_api.getElements("isMonitored=true", function(data) {
+		api.getAllElements().then(function(data) {
 
-			// console.log(data);
-
-			// fill in element drop down list
 			var optionsValues = '<select id="elementId">';
 			data.sort(elementSort);
 			$.each(data, function() {
@@ -73,11 +71,8 @@ $(function() {
 			});
 			optionsValues += '</select>';
 			$('#availableElements').html(optionsValues);
-
-			// load existing saved settings, now that the drop down list has
-			// been loaded
+			
 			if (settings) {
-				// update (hidden) edit panel with settings
 				$("#elementId").val(settings.entityId);
 				$("#" + settings.chartType).prop("checked", true);
 				$("#refreshRate").val(settings.refreshRate);
@@ -119,6 +114,7 @@ $(function() {
 		settings["statusBarDivId"] = "statusBar";
 		settings["lastRefreshBarDivId"] = "lastRefreshBar";
 		settings["uptime_api"] = uptime_api;
+		settings["api"] = api;
 		settings["__UPTIME_GADGET_BASE__"] = "__UPTIME_GADGET_BASE__";
 
 		// stop any existing timers in the charts (for when we save and change
