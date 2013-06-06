@@ -21,7 +21,6 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			var entityId = null;
 			var entityName = null;
 			var chartType = null;
-			var uptime_api = null;
 			var api = null;
 			var refreshRate = null;
 			var showLegend  = null;
@@ -33,7 +32,6 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				chartType   = options.chartType;
 				entityId    = options.entityId;
 				entityName  = options.entityName;
-				uptime_api  = options.uptime_api;
 				api = options.api;
 				refreshRate = options.refreshRate;
 				showLegend  = options.showLegend;

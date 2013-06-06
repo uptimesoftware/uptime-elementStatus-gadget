@@ -1,6 +1,4 @@
 $(function() {
-	// uptimeApi
-	var uptime_api = new uptimeApi();
 	var api = new apiQueries();
 	var myChart = null;
 
@@ -113,7 +111,6 @@ $(function() {
 		settings["chartDivId"] = "widgetChart";
 		settings["statusBarDivId"] = "statusBar";
 		settings["lastRefreshBarDivId"] = "lastRefreshBar";
-		settings["uptime_api"] = uptime_api;
 		settings["api"] = api;
 		settings["__UPTIME_GADGET_BASE__"] = "__UPTIME_GADGET_BASE__";
 
