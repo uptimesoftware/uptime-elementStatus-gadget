@@ -17,7 +17,6 @@
 		#includeResources()
 		
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/apiQueries.js"></script>
-		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/uptimeApi.js"></script>
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/elementStatus.js"></script>
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/uptimeElementStatusBarChart.js"></script>
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/uptimeElementStatusPieChart.js"></script>
