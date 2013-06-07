@@ -99,7 +99,7 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 						}
 					},
 					legend: {
-						enabled: showLegend,
+						enabled: true,
 						floating: false
 					},
 					plotOptions: {

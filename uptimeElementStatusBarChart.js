@@ -16,25 +16,21 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			});
 
 			var chartDivId = null;
-			var lastRefreshBarDivId = null;
 			var statusBarDivId = null;
 			var entityId = null;
 			var entityName = null;
 			var chartType = null;
 			var api = null;
 			var refreshRate = null;
-			var showLegend  = null;
 
 			if (typeof options == "object") {
 				chartDivId  = options.chartDivId;
-				lastRefreshBarDivId = "#" + options.lastRefreshBarDivId;
 				statusBarDivId = options.statusBarDivId;
 				chartType   = options.chartType;
 				entityId    = options.entityId;
 				entityName  = options.entityName;
 				api = options.api;
 				refreshRate = options.refreshRate;
-				showLegend  = options.showLegend;
 			}
 
 			var statusData = [ 	 
@@ -101,7 +97,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 						}
 					},
 					legend: {
-						enabled: showLegend,
+						enabled: true,
 						floating: false
 					},
 					tooltip : {
@@ -142,8 +138,6 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 					}
 				});
 
-				// update lastRefreshBar
-				$(lastRefreshBarDivId).show();
 				var dt = new Date();
 				$(lastRefreshBarDivId).html("<small>Last refreshed: " + dt.getMonth() + "/" + dt.getDate() + "/" + dt.getFullYear() + " - " +  dt.getHours()+ ":" +  dt.getMinutes() + ":" +  dt.getSeconds() + "</small>");
 

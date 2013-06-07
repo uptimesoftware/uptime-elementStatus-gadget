@@ -20,7 +20,6 @@ $(function() {
 		var entityId = $('#elementId').find(":selected").val();
 		var entityName = $('#elementId').find(":selected").text();
 		var refreshRate = $('#refreshRate').val();
-		var showLegend = $('#showLegend').attr('checked') ? true : false;
 
 		// save group name for now, just for demo purposes
 		var settings = {
@@ -28,7 +27,6 @@ $(function() {
 			'chartType' : radioId,
 			'entityName' : entityName,
 			'refreshRate' : refreshRate,
-			'showLegend' : showLegend
 		};
 		uptimeGadget.saveSettings(settings).then(onGoodSave, onBadAjax);
 	});
