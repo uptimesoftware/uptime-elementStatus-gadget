@@ -20,7 +20,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 			var chartType = null;
 			var api = null;
 			var refreshRate = null;
-			var showLegend = null;
 
 			if (typeof options == "object") {
 				chartDivId  = options.chartDivId;
@@ -30,7 +29,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 				entityName  = options.entityName;
 				api = options.api;
 				refreshRate = options.refreshRate;
-				showLegend  = options.showLegend;
 			}
 
 			var seriesData = [	 
@@ -84,10 +82,16 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 					credits: { enabled: false },
 					
 					title: {
-						text : entityName
+						text : entityName,
+						style:{
+							fontSize: '10px'
+						}
 					},
 					subtitle : {
-						text : "Monitor Status"
+						text : "Monitor Status",
+						style:{
+							fontSize: '8px'
+						}
 					},
 					tooltip: {
 						formatter: function() {
@@ -99,7 +103,7 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 						}
 					},
 					legend: {
-						enabled: true,
+						enabled: false,
 						floating: false
 					},
 					plotOptions: {
@@ -113,19 +117,13 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 											connectorColor: '#000000',
 											formatter: function() {
 												return '<b>'+ this.point.name +'</b> ('+ this.y+") "+Math.floor(this.percentage)+' %';
+											},
+											style:{
+												fontSize: '8px'
 											}
 									},
-									animation : true,
-									showInLegend : true,
-									point : {
-										events : {
-											legendItemClick : function() {
-												if (this.y <= 0) {
-													return false;
-												}
-											}
-										}
-									}
+									animation : true
+
 							}
 					},
 					series: [   {

@@ -79,10 +79,16 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 						}
 					},
 					title : {
-						text : "<a href='/main.php?section=Profile&subsection=&id="+entityId+"&name=" + entityName + "&dlsection=s_status' target='_top'>" + entityName
+						text : "<a href='/main.php?section=Profile&subsection=&id="+entityId+"&name=" + entityName + "&dlsection=s_status' target='_top'>" + entityName						,
+						style:{
+							fontSize: '10px'
+						}
 					},
 					subtitle : {
-						text : "Monitor Status"
+						text : "Monitor Status",
+						style:{
+							fontSize: '8px'
+						}
 					},
 					xAxis: {
 						labels: {
