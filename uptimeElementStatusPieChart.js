@@ -14,7 +14,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 			});
 
 			var chartDivId = null;
-			var lastRefreshBarDivId = null;
 			var statusBarDivId = null;
 			var entityId = null;
 			var entityName = null;
@@ -25,7 +24,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 
 			if (typeof options == "object") {
 				chartDivId  = options.chartDivId;
-				lastRefreshBarDivId = "#" + options.lastRefreshBarDivId;
 				statusBarDivId = options.statusBarDivId;
 				chartType   = options.chartType;
 				entityId    = options.entityId;
@@ -86,7 +84,7 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 					credits: { enabled: false },
 					
 					title: {
-							text: "<a href='http://sdgjkldsg.gsdsg'>" + entityName + "</a>"
+						text : entityName
 					},
 					subtitle : {
 						text : "Monitor Status"
@@ -114,11 +112,20 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 											color: '#000000',
 											connectorColor: '#000000',
 											formatter: function() {
-													return '<b>'+ this.point.name +'</b> ('+ this.y+") "+Math.floor(this.percentage)+' %';
+												return '<b>'+ this.point.name +'</b> ('+ this.y+") "+Math.floor(this.percentage)+' %';
 											}
 									},
 									animation : true,
-									showInLegend : true
+									showInLegend : true,
+									point : {
+										events : {
+											legendItemClick : function() {
+												if (this.y <= 0) {
+													return false;
+												}
+											}
+										}
+									}
 							}
 					},
 					series: [   {
@@ -134,9 +141,9 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 				
 				var reloadMs = refreshRate * 60 * 1000;
 				
-				$(lastRefreshBarDivId).show();
+			
 				var dt = new Date();
-				$(lastRefreshBarDivId).html("<small>Last refreshed: " + dt.getMonth() + "/" + dt.getDate() + "/" + dt.getFullYear() + " - " +  dt.getHours()+ ":" +  dt.getMinutes() + ":" +  dt.getSeconds() + "</small>");
+			
 				api.getElementStatus(entityId).then(function(fullData) {
 					
 					$.each(fullData.monitorStatus, function(index,monitor) {

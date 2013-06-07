@@ -4,7 +4,6 @@ $(function() {
 
 	$("#widgetSettings").hide();
 	$("#widgetChart").hide();
-	$("#lastRefreshBar").hide();
 
 	function showEditPanel() {
 		// stop any existing timers in the charts (for when we save and change
@@ -14,7 +13,6 @@ $(function() {
 		}
 		$("#widgetSettings").show();
 		$("#widgetChart").hide();
-		$("#lastRefreshBar").hide();
 	}
 
 	$("#saveSettings").click(function() {
@@ -37,7 +35,6 @@ $(function() {
 	$("#cancelSettings").click(function() {
 		$("#widgetChart").show();
 		$("#widgetSettings").hide();
-		$("#lastRefreshBar").hide();
 		if (myChart) {
 			myChart.startTimer();
 		}
@@ -46,7 +43,6 @@ $(function() {
 	function displayPanel(settings) {
 		$("#widgetChart").show();
 		$("#widgetSettings").hide();
-		$("#lastRefreshBar").hide();
 
 		// Display the chart
 		displayChart(settings);
@@ -110,7 +106,6 @@ $(function() {
 		// add/edit settings object with extra properties
 		settings["chartDivId"] = "widgetChart";
 		settings["statusBarDivId"] = "statusBar";
-		settings["lastRefreshBarDivId"] = "lastRefreshBar";
 		settings["api"] = api;
 		settings["__UPTIME_GADGET_BASE__"] = "__UPTIME_GADGET_BASE__";
 

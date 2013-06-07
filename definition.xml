@@ -54,7 +54,6 @@
 		</div>
 
 		<div id = "widgetChart" style="border:1px solid;"></div>
-		<div id="lastRefreshBar" style="display:none; width:100%; font-weight:bold;font-size:larger; ">Last Refresh: none yet</div>
 		<div id="statusBar" style="display:none; width:100%; font-weight:bold;font-size:larger; ">Backend Call Status</div>
 
 
