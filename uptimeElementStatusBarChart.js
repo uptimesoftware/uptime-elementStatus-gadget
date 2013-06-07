@@ -142,7 +142,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				$(lastRefreshBarDivId).html("<small>Last refreshed: " + dt.getMonth() + "/" + dt.getDate() + "/" + dt.getFullYear() + " - " +  dt.getHours()+ ":" +  dt.getMinutes() + ":" +  dt.getSeconds() + "</small>");
 
 				// set chart refresh to update itself automatically
-				chartTimer = setTimeout(updateChart, refreshRate*1000);
+				chartTimer = setTimeout(updateChart, refreshRate*1000*60);
 			},
 			function(jqXHR, textStatus, errorThrown) {
 				// error callback
