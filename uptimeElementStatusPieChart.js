@@ -14,7 +14,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 			});
 
 			var chartDivId = null;
-			var statusBarDivId = null;
 			var entityId = null;
 			var entityName = null;
 			var chartType = null;
@@ -23,7 +22,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 
 			if (typeof options == "object") {
 				chartDivId  = options.chartDivId;
-				statusBarDivId = options.statusBarDivId;
 				chartType   = options.chartType;
 				entityId    = options.entityId;
 				entityName  = options.entityName;
@@ -165,10 +163,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 					
 					
 					},function(jqXHR, textStatus, errorThrown) {
-						var statusBar = $(statusBarDivId);
-						statusBar.css("color", "red");
-						statusBar.text("Can't connect to the up.time API.");
-						statusBar.show();
 					}
 				);
 				

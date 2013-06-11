@@ -16,7 +16,6 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			});
 
 			var chartDivId = null;
-			var statusBarDivId = null;
 			var entityId = null;
 			var entityName = null;
 			var chartType = null;
@@ -25,7 +24,6 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 
 			if (typeof options == "object") {
 				chartDivId  = options.chartDivId;
-				statusBarDivId = options.statusBarDivId;
 				chartType   = options.chartType;
 				entityId    = options.entityId;
 				entityName  = options.entityName;
@@ -103,7 +101,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 						}
 					},
 					legend: {
-						enabled: true,
+						enabled: false,
 						floating: false
 					},
 					tooltip : {
