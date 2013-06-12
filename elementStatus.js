@@ -1,7 +1,7 @@
 $(function() {
 	var api = new apiQueries();
 	var myChart = null;
-
+	var divsToDim = [ '#widgetSettings', '#widgetChart' ];
 	$("#widgetSettings").hide();
 	$("#widgetChart").hide();
 
@@ -68,6 +68,7 @@ $(function() {
 				$("#" + settings.chartType).prop("checked", true);
 				$("#refreshRate").val(settings.refreshRate);
 			}
+			gadgetDimOff();
 		}, function(jqXHR, textStatus, errorThrown) {
 			onBadAjax(jqXHR);
 		});
@@ -82,11 +83,30 @@ $(function() {
 	function onGoodSave(savedSettings) {
 		displayPanel(savedSettings);
 	}
+	
+	function gadgetDimOn() {
+		$.each(divsToDim, function(i, d) {
+			var div = $(d);
+			if (div.is(':visible') && div.css('opacity') > 0.6) {
+				div.fadeTo('slow', 0.3);
+			}
+		});
+	}
+
+	function gadgetDimOff() {
+		$.each(divsToDim, function(i, d) {
+			var div = $(d);
+			if (div.is(':visible') && div.css('opacity') < 0.6) {
+				div.fadeTo('slow', 1);
+			}
+		});
+	}
 
 	function onBadAjax(errorObject) {
 		var notificationPanel = $('#notificationPanel').empty();
 		var errorBox = uptimeErrorFormatter.getErrorBox(error);
 		errorBox.appendTo(notificationPanel);
+		gadgetDimOn();
 		notificationPanel.slideDown();
 	}
 

@@ -5,6 +5,7 @@ if (typeof UPTIME == "undefined") {
 if (typeof UPTIME.ElementStatusPieChart == "undefined") {
         UPTIME.ElementStatusPieChart = function(options) {
 
+        	var divsToDim = [ '#widgetSettings', '#widgetChart' ];
 			var chartTimer = null;
 
 			Highcharts.setOptions({
@@ -130,6 +131,23 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 						data: seriesData
 					}]
 			});
+			function gadgetDimOn() {
+				$.each(divsToDim, function(i, d) {
+					var div = $(d);
+					if (div.is(':visible') && div.css('opacity') > 0.6) {
+						div.fadeTo('slow', 0.3);
+					}
+				});
+			}
+
+			function gadgetDimOff() {
+				$.each(divsToDim, function(i, d) {
+					var div = $(d);
+					if (div.is(':visible') && div.css('opacity') < 0.6) {
+						div.fadeTo('slow', 1);
+					}
+				});
+			}
 	 
 			function requestData() {
 				var statusCount = { 'OK': 0, 'WARN': 0, 'CRIT': 0, 'UNKNOWN': 0, 'MAINT': 0};
@@ -166,6 +184,7 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 						var notificationPanel = $('#notificationPanel').empty();
 						var errorBox = uptimeErrorFormatter.getErrorBox(jqXHR);
 						errorBox.appendTo(notificationPanel);
+						gadgetDimOn();
 						notificationPanel.slideDown();
 					}
 				);

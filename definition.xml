@@ -58,7 +58,7 @@
 			<br/><span style="float:right">v1.0</span><br/>
 		</div>
 
-		<div id = "widgetChart" style="border:1px solid;"></div>
+		<div id = "widgetChart"></div>
 		<div id="notificationPanel"></div>
 
 
