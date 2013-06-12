@@ -124,16 +124,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				}
 			});
 		}
-
-		function gadgetDimOff() {
-			$.each(divsToDim, function(i, d) {
-				var div = $(d);
-				if (div.is(':visible') && div.css('opacity') < 0.6) {
-					div.fadeTo('slow', 1);
-				}
-			});
-		}
-
+		
 		function updateChart() {
 			api.getElementStatus(entityId).then(
 					function(fullData) {
