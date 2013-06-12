@@ -11,6 +11,8 @@ $(function() {
 		if (myChart) {
 			myChart.stopTimer();
 		}
+		$('#notificationPanel').slideUp().empty();
+		gadgetDimOff();
 		$("#widgetSettings").show();
 		$("#widgetChart").hide();
 	}
@@ -68,6 +70,7 @@ $(function() {
 				$("#" + settings.chartType).prop("checked", true);
 				$("#refreshRate").val(settings.refreshRate);
 			}
+			$('#notificationPanel').slideUp().empty();
 			gadgetDimOff();
 		}, function(jqXHR, textStatus, errorThrown) {
 			onBadAjax(jqXHR);
