@@ -149,8 +149,10 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				chartTimer = setTimeout(updateChart, refreshRate*1000*60);
 			},
 			function(jqXHR, textStatus, errorThrown) {
-				// error callback
-				chart.showLoading(errorThrown);
+				var notificationPanel = $('#notificationPanel').empty();
+				var errorBox = uptimeErrorFormatter.getErrorBox(jqXHR);
+				errorBox.appendTo(notificationPanel);
+				notificationPanel.slideDown();
 			});
 		}
 

@@ -163,6 +163,10 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 					
 					
 					},function(jqXHR, textStatus, errorThrown) {
+						var notificationPanel = $('#notificationPanel').empty();
+						var errorBox = uptimeErrorFormatter.getErrorBox(jqXHR);
+						errorBox.appendTo(notificationPanel);
+						notificationPanel.slideDown();
 					}
 				);
 				

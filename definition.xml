@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-	<ModulePrefs title="Element Status Panel">
+	<ModulePrefs title="Element Status Chart">
 		<Require feature="dynamic-height" />
 	</ModulePrefs>
 	<Content type="html">
@@ -59,7 +59,7 @@
 		</div>
 
 		<div id = "widgetChart" style="border:1px solid;"></div>
-		<div id="statusBar" style="display:none; width:100%; font-weight:bold;font-size:larger; ">Backend Call Status</div>
+		<div id="notificationPanel"></div>
 
 
 	</body>

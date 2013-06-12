@@ -69,6 +69,7 @@ $(function() {
 				$("#refreshRate").val(settings.refreshRate);
 			}
 		}, function(jqXHR, textStatus, errorThrown) {
+			onBadAjax(jqXHR);
 		});
 
 		if (settings) {
@@ -83,6 +84,10 @@ $(function() {
 	}
 
 	function onBadAjax(errorObject) {
+		var notificationPanel = $('#notificationPanel').empty();
+		var errorBox = uptimeErrorFormatter.getErrorBox(error);
+		errorBox.appendTo(notificationPanel);
+		notificationPanel.slideDown();
 	}
 
 	function displayChart(settings) {
