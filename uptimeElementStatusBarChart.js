@@ -4,8 +4,7 @@ if (typeof UPTIME == "undefined") {
 
 // Define class/function name
 if (typeof UPTIME.ElementStatusBarChart == "undefined") {
-	UPTIME.ElementStatusBarChart = function(options) {
-    	var divsToDim = [ '#widgetSettings', '#widgetChart' ];
+	UPTIME.ElementStatusBarChart = function(options, displayStatusBar, clearStatusBar) {
 		var chartTimer = null;
 
 		Highcharts.setOptions({
@@ -15,18 +14,17 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 		});
 
 		var chartDivId = null;
-		var entityId = null;
-		var entityName = null;
+		var elementId = null;
+		var elementName = null;
 		var chartType = null;
-		var api = null;
+		var api = new apiQueries();
 		var refreshRate = null;
 
 		if (typeof options == "object") {
 			chartDivId = options.chartDivId;
-			chartType = options.chartType;
-			entityId = options.entityId;
-			entityName = options.entityName;
-			api = options.api;
+			chartType = options.chartTypeId;
+			elementId = options.elementId;
+			elementName = options.elementName;
 			refreshRate = options.refreshRate;
 		}
 
@@ -76,8 +74,8 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				}
 			},
 			title : {
-				text : "<a href='/main.php?section=Profile&subsection=&id=" + entityId + "&name=" + entityName
-						+ "&dlsection=s_status' target='_top'>" + entityName,
+				text : "<a href='/main.php?section=Profile&subsection=&id=" + elementId + "&name=" + elementName
+						+ "&dlsection=s_status' target='_top'>" + elementName,
 				style : {
 					fontSize : '10px'
 				}
@@ -116,72 +114,63 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			series : statusData
 		});
 
-		function gadgetDimOn() {
-			$.each(divsToDim, function(i, d) {
-				var div = $(d);
-				if (div.is(':visible') && div.css('opacity') > 0.6) {
-					div.fadeTo('slow', 0.3);
-				}
-			});
-		}
-		
 		function updateChart() {
-			api.getElementStatus(entityId).then(
-					function(fullData) {
+			api.getElementStatus(elementId).then(function(fullData) {
 
-						var allMonitorsStatus = fullData['monitorStatus'];
-						var statusTally = {};
-						for ( var index in allMonitorsStatus) {
-							var monitorStatus = allMonitorsStatus[index]["status"];
-							if (!statusTally.hasOwnProperty(monitorStatus)) {
-								statusTally[monitorStatus] = 0;
-							}
-							statusTally[monitorStatus]++;
+				var allMonitorsStatus = fullData['monitorStatus'];
+				var statusTally = {};
+				for ( var index in allMonitorsStatus) {
+					var monitor = allMonitorsStatus[index];
+					var monitorStatus = monitor["status"];
+					if ((monitor.isMonitored) && !(monitor.isHidden)) {
+						if (!statusTally.hasOwnProperty(monitorStatus)) {
+							statusTally[monitorStatus] = 0;
 						}
+						statusTally[monitorStatus]++;
+					}
+				}
 
-						var displayStatuses = [ "OK", "WARN", "CRIT", "UNKNOWN", "MAINT" ];
+				var displayStatuses = [ "OK", "WARN", "CRIT", "UNKNOWN", "MAINT" ];
 
-						$.each(displayStatuses, function(index, statusName) {
-							var bar = chart.get(statusName);
-							if (statusTally.hasOwnProperty(statusName)) {
-								bar.show();
-								bar.setData([ statusTally[statusName] ]);
-							} else {
-								bar.hide();
-							}
-						});
+				$.each(displayStatuses, function(index, statusName) {
+					var bar = chart.get(statusName);
+					if (statusTally.hasOwnProperty(statusName)) {
+						bar.show();
+						bar.setData([ statusTally[statusName] ]);
+					} else {
+						bar.hide();
+					}
+				});
 
-						var dt = new Date();
-						$(lastRefreshBarDivId).html(
-								"<small>Last refreshed: " + dt.getMonth() + "/" + dt.getDate() + "/" + dt.getFullYear() + " - "
-										+ dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds() + "</small>");
-
-						// set chart refresh to update itself automatically
-						chartTimer = setTimeout(updateChart, refreshRate * 1000 * 60);
-					}, function(jqXHR, textStatus, errorThrown) {
-						var notificationPanel = $('#notificationPanel').empty();
-						var errorBox = uptimeErrorFormatter.getErrorBox(jqXHR);
-						errorBox.appendTo(notificationPanel);
-						gadgetDimOn();
-						notificationPanel.slideDown();
-					});
+				clearStatusBar();
+				chart.hideLoading();
+			}, function(error) {
+				chart.hideLoading();
+				displayStatusBar(error, "Error Loading Chart Data");
+			});
+			// set chart refresh to update itself automatically
+			if (refreshRate > 0) {
+				chartTimer = setTimeout(updateChart, refreshRate * 1000);
+			}
 		}
 
 		// public functions for this function/class
-		var public = {
+		var publicFns = {
 			stopTimer : function() {
 				if (chartTimer) {
 					window.clearTimeout(chartTimer);
 				}
 			},
-			startTimer : function() {
-				if (chartTimer) {
-					updateChart();
-				}
+			render : function() {
+				chart.showLoading();
+				updateChart();
+			},
+			destroy : function() {
+				chart.destroy();
 			}
 		};
-		return public; // Important: we need to return the public
-						// functions/methods
+		return publicFns; // Important: we need to return the public
+		// functions/methods
 
 	};
 }

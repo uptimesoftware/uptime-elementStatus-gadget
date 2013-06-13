@@ -10,16 +10,15 @@
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-		<title>Current Status</title>
-		<link href="/styles/uptime.css" type="text/css" rel="stylesheet" />
+		<title>Current Element Status</title>
 		<link href="__UPTIME_GADGET_BASE__/elementStatus.css" type="text/css" rel="stylesheet" />
 
-		#includeResources()
+		#includeResources(jquery,jqueryui,highcharts)
 		
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/apiQueries.js"></script>
-		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/elementStatus.js"></script>
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/uptimeElementStatusBarChart.js"></script>
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/uptimeElementStatusPieChart.js"></script>
+		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/elementStatus.js"></script>
 		
 	</head>
 
@@ -30,36 +29,38 @@
 		<div id="widgetSettings">
 			Select Element:
 			<form id="widgetOptions">
-				<div id="availableElements"></div>
+				<div id="availableElements">
+					<select id="elementId" class="element-status-setting">
+						<option value="-1">Loading...</option>
+					</select>
+				</div>
 				<br/>
 				Display As:
 				<br/>
-				<input type="radio" checked id="pie" name="chartType" value="pie"> Pie Chart
+				<input type="radio" checked id="pie" class="element-status-setting" name="chartType" value="pie"> Pie Chart
 				<br/>
-				<input type="radio" id="bar" name="chartType" value="bar"> Horizontal Bar Chart
+				<input type="radio" id="bar" class="element-status-setting" name="chartType" value="bar"> Horizontal Bar Chart
 				<br/>
-				<input type="radio" id="column" name="chartType" value="column"> Vertical Bar Chart
+				<input type="radio" id="column" class="element-status-setting" name="chartType" value="column"> Vertical Bar Chart
 				<br/>
 				<br/>
-				Refresh Rate:
-				<select id="refreshRate" value="1">
-					<option value="0.5">30s</option>
-					<option value="1">1m</option>
-					<option value="5">5m</option>
-					<option value="10">10m</option>
-					<option value="15">15m</option>
-					<option value="60">60m</option>
-					<option value="0">Never</option>
-				</select>
+					<label for="refreshRate">Refresh Rate:</label>
+					<select id="refreshRate" class="element-status-setting" name="refreshRate">
+						<option value="30">30s</option>
+						<option value="60">1m</option>
+						<option value="300">5m</option>
+						<option value="600">10m</option>
+						<option value="900">15m</option>
+						<option value="3600">1h</option>
+						<option value="-1">Never</option>
+					</select>
 				<br/><br/>
-				<input id="saveSettings" type="button" value="Save"/>
-				<input id="cancelSettings" type="button" value="Cancel"/>
+				<input id="closeSettings" type="button" value="Close"/>
 			</form>
-			<br/><span style="float:right">v1.0</span><br/>
 		</div>
 
 		<div id = "widgetChart"></div>
-		<div id="notificationPanel"></div>
+		<div id="statusBar"></div>
 
 
 	</body>

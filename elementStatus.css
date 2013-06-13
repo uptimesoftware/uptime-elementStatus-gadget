@@ -1,46 +1,28 @@
-#bigTableHeading {
-	padding: 7px;
-	font-align: center;
-	font-size: 130%;
+html {
+	overflow: auto !important;
 }
 
-#notificationPanel {
+body {
+	overflow: auto !important;
+}
+
+#widgetChart {
+	padding-top: 2px;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+#widgetSettings {
+	border: 2px #BDBDBD solid;
+	border-radius: 5px;
+	padding: 10px;
+	background-color: #FDFDFD;
+}
+
+#statusBar {
 	position: absolute;
 	top: 10px;
 	left: 0px;
 	display: none;
 	width: 100%;
-}
-
-td a {
-	padding: 3px;
-	display: block;
-	width: 100%;
-	height: 100%;
-}
-
-td.OK {
-	background-color: #67B10B;
-	color: #444;
-	font-align: center;
-}
-
-td.WARN {
-	background-color: #DAD60B;
-	color: #444;
-}
-
-td.CRIT {
-	background-color: #B61211;
-	color: #FFFFFF;
-}
-
-td.MAINT {
-	background-color: #555B98;
-	color: #FFFFFF;
-}
-
-td.UNKNOWN {
-	background-color: #AEAEAE;
-	color: #444;
 }

@@ -1,92 +1,141 @@
 $(function() {
 	var api = new apiQueries();
 	var myChart = null;
-	var divsToDim = [ '#widgetSettings', '#widgetChart' ];
+	var elementStatusSettings = {
+		entityId : -1,
+		chartTypeId : "pieChartType",
+		entityName : "",
+		refreshInterval : 30,
+	};
+	var divsToDim = [ '#widgetChart', '#widgetSettings' ];
+
 	$("#widgetSettings").hide();
-	$("#widgetChart").hide();
+
+	$('.element-status-setting').change(settingChanged);
+
+	$("#closeSettings").button().click(function() {
+		$("#widgetSettings").slideUp();
+	});
+
+	uptimeGadget.registerOnEditHandler(showEditPanel);
+	uptimeGadget.registerOnLoadHandler(function() {
+		uptimeGadget.loadSettings().then(goodLoad, onBadAjax);
+	});
+	uptimeGadget.registerOnResizeHandler(resizeGadget);
+
+	function resizeGadget() {
+		$("body").height($(window).height());
+	}
+
+	function settingChanged() {
+		elementStatusSettings.chartTypeId = $("#widgetOptions input[name=chartType]:radio:checked").val();
+		elementStatusSettings.elementId = $('#elementId').find(":selected").val();
+		elementStatusSettings.elementName = $('#elementId').find(":selected").text();
+		elementStatusSettings.refreshInterval = $("#refreshRate").val();
+		uptimeGadget.saveSettings(elementStatusSettings).then(onGoodSave, onBadAjax);
+	}
+
+	function displayStatusBar(error, msg) {
+		gadgetDimOn();
+		var statusBar = $("#statusBar");
+		statusBar.empty();
+		var errorBox = uptimeErrorFormatter.getErrorBox(error, msg);
+		errorBox.appendTo(statusBar);
+		statusBar.slideDown();
+	}
+
+	function clearStatusBar() {
+		gadgetDimOff();
+		var statusBar = $("#statusBar");
+		statusBar.slideUp().empty();
+	}
 
 	function showEditPanel() {
-		// stop any existing timers in the charts (for when we save and change
-		// settings)
 		if (myChart) {
 			myChart.stopTimer();
 		}
-		$('#notificationPanel').slideUp().empty();
-		gadgetDimOff();
-		$("#widgetSettings").show();
-		$("#widgetChart").hide();
+
+		$("#widgetOptions input[name=chartType]").filter('[value=' + elementStatusSettings.chartTypeId + ']').prop('checked',
+				true);
+		$('#elementId').val(elementStatusSettings.elementId);
+		$("#refreshRate").val(elementStatusSettings.refreshInterval);
+
+		$("#widgetSettings").slideDown();
+		resizeGadget();
+		return populateIdSelector().then(function() {
+			settingChanged();
+		});
 	}
 
-	$("#saveSettings").click(function() {
-		var radioId = $("#widgetOptions input[name=chartType]:radio:checked").val();
-		var entityId = $('#elementId').find(":selected").val();
-		var entityName = $('#elementId').find(":selected").text();
-		var refreshRate = $('#refreshRate').val();
+	function disableSettings() {
+		$('.element-status-setting').prop('disabled', true);
+		$('#closeButton').prop('disabled', true).addClass("ui-state-disabled");
+	}
 
-		// save group name for now, just for demo purposes
-		var settings = {
-			'entityId' : entityId,
-			'chartType' : radioId,
-			'entityName' : entityName,
-			'refreshRate' : refreshRate,
-		};
-		uptimeGadget.saveSettings(settings).then(onGoodSave, onBadAjax);
-	});
-	$("#cancelSettings").click(function() {
-		$("#widgetChart").show();
-		$("#widgetSettings").hide();
-		if (myChart) {
-			myChart.startTimer();
-		}
-	});
+	function enableSettings() {
+		$('.element-status-setting').prop('disabled', false);
+		$('#closeButton').prop('disabled', false).removeClass("ui-state-disabled");
+	}
 
 	function displayPanel(settings) {
 		$("#widgetChart").show();
-		$("#widgetSettings").hide();
-
-		// Display the chart
-		displayChart(settings);
+		displayChart(settings.chartTypeId, settings.elementId, settings.elementName, settings.refreshInterval);
+		resizeGadget();
 	}
 
 	function elementSort(arg1, arg2) {
 		return naturalSort(arg1.name, arg2.name);
 	}
 
-	// Main Gadget Logic Start
-	function goodLoad(settings) {
-
-		api.getAllElements().then(function(data) {
-
-			var optionsValues = '<select id="elementId">';
-			data.sort(elementSort);
-			$.each(data, function() {
-				optionsValues += '<option value="' + this.id + '">' + this.name + '</option>';
+	function populateIdSelector() {
+		disableSettings();
+		$('#elementId').empty().append($("<option />").val(-1).text("Loading..."));
+		return api.getAllElements().then(function(elements) {
+			clearStatusBar();
+			enableSettings();
+			// fill in element drop down list
+			elements.sort(elementSort);
+			var elementSelector = $('#elementId').empty();
+			$.each(elements, function() {
+				if (!this.isMonitored) {
+					return;
+				}
+				elementSelector.append($("<option />").val(this.id).text(this.name));
 			});
-			optionsValues += '</select>';
-			$('#availableElements').html(optionsValues);
-			
-			if (settings) {
-				$("#elementId").val(settings.entityId);
-				$("#" + settings.chartType).prop("checked", true);
-				$("#refreshRate").val(settings.refreshRate);
+			if (elementStatusSettings.elementId >= 0) {
+				elementSelector.val(elementStatusSettings.elementId);
 			}
-			$('#notificationPanel').slideUp().empty();
-			gadgetDimOff();
-		}, function(jqXHR, textStatus, errorThrown) {
-			onBadAjax(jqXHR);
+		}, function(error) {
+			displayStatusBar(error, "Error Loading the List of Elements from up.time Controller");
 		});
+	}
 
+	function goodLoad(settings) {
+		clearStatusBar();
 		if (settings) {
+			// update hidden edit panel with settings
+			$("#elementId").val(settings.elementId);
+			$("#" + settings.chartTypeId).prop("checked", true);
+			$("#refreshRate").val(settings.refreshInterval);
+			$.extend(elementStatusSettings, settings);
+
 			displayPanel(settings);
 		} else {
+			$('#widgetChart').hide();
 			showEditPanel();
 		}
+
 	}
 
 	function onGoodSave(savedSettings) {
+		clearStatusBar();
 		displayPanel(savedSettings);
 	}
-	
+
+	function onBadAjax(error) {
+		displayStatusBar(error, "Error Communicating with up.time");
+	}
+
 	function gadgetDimOn() {
 		$.each(divsToDim, function(i, d) {
 			var div = $(d);
@@ -105,44 +154,33 @@ $(function() {
 		});
 	}
 
-	function onBadAjax(errorObject) {
-		var notificationPanel = $('#notificationPanel').empty();
-		var errorBox = uptimeErrorFormatter.getErrorBox(error);
-		errorBox.appendTo(notificationPanel);
-		gadgetDimOn();
-		notificationPanel.slideDown();
-	}
-
-	function displayChart(settings) {
-		// add/edit settings object with extra properties
-		settings["chartDivId"] = "widgetChart";
-		settings["api"] = api;
-		settings["__UPTIME_GADGET_BASE__"] = "__UPTIME_GADGET_BASE__";
-
-		// stop any existing timers in the charts (for when we save and change
-		// settings)
+	function displayChart(chartType, elementId, elementName, refreshInterval) {
 		if (myChart) {
 			myChart.stopTimer();
+			myChart.destroy();
+			myChart = null;
 		}
 
-		// display chart
-		if (settings.chartType == "bar") {
-			// bar/column chart
-			myChart = new UPTIME.ElementStatusBarChart(settings);
-		} else if (settings.chartType == "pie") {
-			// pie chart
-			myChart = new UPTIME.ElementStatusPieChart(settings);
+		if (chartType == "pie") {
+			myChart = new UPTIME.ElementStatusPieChart({
+				chartDivId : "widgetChart",
+				chartType : chartType,
+				elementId : elementId,
+				elementName : elementName,
+				refreshInterval : refreshInterval,
+				statusBarDivId : "statusBar"
+			}, displayStatusBar, clearStatusBar);
 		} else {
-			// column chart
-			myChart = new UPTIME.ElementStatusBarChart(settings);
+			myChart = new UPTIME.ElementStatusBarChart({
+				chartDivId : "widgetChart",
+				chartTypeId : chartType,
+				elementId : elementId,
+				elementName : elementName,
+				refreshInterval : refreshInterval,
+				statusBarDivId : "statusBar"
+			}, displayStatusBar, clearStatusBar);
 		}
+		myChart.render();
 	}
-
-	// Always load these at the end
-	uptimeGadget.registerOnEditHandler(showEditPanel);
-	uptimeGadget.registerOnLoadHandler(function() {
-		uptimeGadget.loadSettings().then(goodLoad, onBadAjax);
-	});
-	// uptimeGadget.registerOnUploadFile(function (e){});
 
 });

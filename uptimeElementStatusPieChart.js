@@ -1,208 +1,191 @@
 if (typeof UPTIME == "undefined") {
-        var UPTIME = {};
+	var UPTIME = {};
 }
 
 if (typeof UPTIME.ElementStatusPieChart == "undefined") {
-        UPTIME.ElementStatusPieChart = function(options) {
+	UPTIME.ElementStatusPieChart = function(options, displayStatusBar, clearStatusBar) {
 
-        	var divsToDim = [ '#widgetSettings', '#widgetChart' ];
-			var chartTimer = null;
+		var chartTimer = null;
 
-			Highcharts.setOptions({
-				global : {
-					useUTC : false
-				}
-			});
-
-			var chartDivId = null;
-			var entityId = null;
-			var entityName = null;
-			var chartType = null;
-			var api = null;
-			var refreshRate = null;
-
-			if (typeof options == "object") {
-				chartDivId  = options.chartDivId;
-				chartType   = options.chartType;
-				entityId    = options.entityId;
-				entityName  = options.entityName;
-				api = options.api;
-				refreshRate = options.refreshRate;
+		Highcharts.setOptions({
+			global : {
+				useUTC : false
 			}
+		});
 
-			var seriesData = [	 
-							{
-								id : 'OK',
-								name : 'OK',
-								y : 0,
-								color: '#67B10B',
-								type:"pie"
-							}, 		 {
-								id : 'WARN',
-								name : 'WARN',
-								y : 0,
-								color: '#DAD60B',
-								type:"pie"
-							},		{
-								id : 'CRIT',
-								name : 'CRIT',
-								y : 0,
-								color: '#B61211',
-								type:"pie"
-							},		{
-								id: 'MAINT', 
-								name : 'MAINT',
-								y : 0,
-								color: '#555B98',
-								type:"pie"
-							},		{
-								id : 'UNKNOWN',
-								name : 'UNKNOWN',
-								y : 0,
-								color: '#AEAEAE'									
-							}
-						];
+		var chartDivId = null;
+		var elementId = null;
+		var elementName = null;
+		var chartType = null;
+		var api = new apiQueries();
+		var refreshRate = null;
 
-			var chart;
-			chart = new Highcharts.Chart({
-					chart: {
-							renderTo: chartDivId,
-							height: 200,
-							plotBackgroundColor: null,
-							plotBorderWidth: null,
-							plotShadow: false,
-							events: {
-									load: requestData
-							},
-							yAxis: {
-									allowDecimals:false
-							}               
-					},
-					credits: { enabled: false },
-					
-					title: {
-						text : entityName,
-						style:{
-							fontSize: '10px'
+		if (typeof options == "object") {
+			chartDivId = options.chartDivId;
+			chartType = options.chartTypeId;
+			elementId = options.elementId;
+			elementName = options.elementName;
+			refreshRate = options.refreshRate;
+		}
+
+		var seriesData = [ {
+			id : 'OK',
+			name : 'OK',
+			y : 0,
+			color : '#67B10B',
+			type : "pie"
+		}, {
+			id : 'WARN',
+			name : 'WARN',
+			y : 0,
+			color : '#DAD60B',
+			type : "pie"
+		}, {
+			id : 'CRIT',
+			name : 'CRIT',
+			y : 0,
+			color : '#B61211',
+			type : "pie"
+		}, {
+			id : 'MAINT',
+			name : 'MAINT',
+			y : 0,
+			color : '#555B98',
+			type : "pie"
+		}, {
+			id : 'UNKNOWN',
+			name : 'UNKNOWN',
+			y : 0,
+			color : '#AEAEAE'
+		} ];
+
+		var chart;
+		chart = new Highcharts.Chart({
+			chart : {
+				renderTo : chartDivId,
+				height : 200,
+				plotBackgroundColor : null,
+				plotBorderWidth : null,
+				plotShadow : false,
+				events : {
+					load : requestData
+				},
+				yAxis : {
+					allowDecimals : false
+				}
+			},
+			credits : {
+				enabled : false
+			},
+
+			title : {
+				text : elementName,
+				style : {
+					fontSize : '10px'
+				}
+			},
+			subtitle : {
+				text : "Monitor Status",
+				style : {
+					fontSize : '8px'
+				}
+			},
+			tooltip : {
+				formatter : function() {
+					var plural = "";
+					if (this.y > 1) {
+						plural = "s";
+					}
+					return '<b>' + this.point.name + '</b> - ' + this.y + " monitor" + plural;
+				}
+			},
+			legend : {
+				enabled : false,
+				floating : false
+			},
+			plotOptions : {
+				pie : {
+					allowPointSelect : true,
+					cursor : 'pointer',
+					dataLabels : {
+						enabled : true,
+						distance : 10,
+						color : '#000000',
+						connectorColor : '#000000',
+						formatter : function() {
+							return '<b>' + this.point.name + '</b> (' + this.y + ") " + Math.floor(this.percentage) + ' %';
+						},
+						style : {
+							fontSize : '8px'
 						}
 					},
-					subtitle : {
-						text : "Monitor Status",
-						style:{
-							fontSize: '8px'
-						}
-					},
-					tooltip: {
-						formatter: function() {
-							var plural = "";
-							if (this.y>1){
-								plural = "s";
-							}
-							return '<b>'+ this.point.name +'</b> - '+ this.y +" monitor"+plural;
-						}
-					},
-					legend: {
-						enabled: false,
-						floating: false
-					},
-					plotOptions: {
-							pie: {
-									allowPointSelect: true,
-									cursor: 'pointer',
-									dataLabels: {
-											enabled: true,
-											distance: 0,
-											color: '#000000',
-											connectorColor: '#000000',
-											formatter: function() {
-												return '<b>'+ this.point.name +'</b> ('+ this.y+") "+Math.floor(this.percentage)+' %';
-											},
-											style:{
-												fontSize: '8px'
-											}
-									},
-									animation : true
+					animation : true
 
-							}
-					},
-					series: [   {
-						type: 'pie',
-						name: 'Browser share',
-						data: seriesData
-					}]
-			});
-			function gadgetDimOn() {
-				$.each(divsToDim, function(i, d) {
-					var div = $(d);
-					if (div.is(':visible') && div.css('opacity') > 0.6) {
-						div.fadeTo('slow', 0.3);
+				}
+			},
+			series : [ {
+				type : 'pie',
+				name : 'Browser share',
+				data : seriesData
+			} ]
+		});
+
+		function requestData() {
+			var statusCount = {
+				'OK' : 0,
+				'WARN' : 0,
+				'CRIT' : 0,
+				'UNKNOWN' : 0,
+				'MAINT' : 0
+			};
+			api.getElementStatus(elementId).then(function(fullData) {
+
+				$.each(fullData.monitorStatus, function(index, monitor) {
+					if ((monitor.isMonitored) && !(monitor.isHidden)) {
+						statusCount[monitor.status]++;
 					}
 				});
-			}
 
-			function requestData() {
-				var statusCount = { 'OK': 0, 'WARN': 0, 'CRIT': 0, 'UNKNOWN': 0, 'MAINT': 0};
-				var groupIdsToInclude = [entityId];
-				
-				var reloadMs = refreshRate * 60 * 1000;
-				
-			
-				var dt = new Date();
-			
-				api.getElementStatus(entityId).then(function(fullData) {
-					
-					$.each(fullData.monitorStatus, function(index,monitor) {
-						if ((monitor.isMonitored) && !(monitor.isHidden)) {
-							statusCount[monitor.status]++;
-						}
-					});
-					
-					$.each(seriesData, function(i, item) {
-							var sliceData = statusCount[item.id];
-							item.y = 0;
-							if (sliceData){
-								item.y = sliceData;
-							}
-							else {
-								item.visible=false;
-							}
-						});
-
-					chart.series[0].setData(seriesData, true);
-					
-					
-					},function(jqXHR, textStatus, errorThrown) {
-						var notificationPanel = $('#notificationPanel').empty();
-						var errorBox = uptimeErrorFormatter.getErrorBox(jqXHR);
-						errorBox.appendTo(notificationPanel);
-						gadgetDimOn();
-						notificationPanel.slideDown();
+				$.each(seriesData, function(i, item) {
+					var sliceData = statusCount[item.id];
+					item.y = 0;
+					if (sliceData) {
+						item.y = sliceData;
+					} else {
+						item.visible = false;
 					}
-				);
-				
-				
+				});
 
-				
-				chartTimer = setTimeout(requestData, reloadMs);
-				
-				
+				chart.series[0].setData(seriesData, true);
+				clearStatusBar();
+				chart.hideLoading();
+			}, function(error) {
+				chart.hideLoading();
+				displayStatusBar(error, "Error Loading Chart Data");
+			});
 
+			if (refreshRate > 0) {
+				chartTimer = setTimeout(requestData, refreshRate * 1000);
 			}
 
+		}
 
 		// public functions for this function/class
-		var public = {
-			stopTimer: function() {
+		var publicFns = {
+			stopTimer : function() {
 				if (chartTimer) {
 					window.clearTimeout(chartTimer);
 				}
 			},
-			startTimer: function() {
-				if (chartTimer) {
-					updateChart();
-				}
+			render : function() {
+				chart.showLoading();
+				requestData();
+			},
+			destroy : function() {
+				chart.destroy();
 			}
 		};
-		return public;	// Important: we need to return the public functions/methods
+		return publicFns; // Important: we need to return the public
+		// functions/methods
 	};
 }
