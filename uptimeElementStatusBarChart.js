@@ -2,11 +2,8 @@ if (typeof UPTIME == "undefined") {
 	var UPTIME = {};
 }
 
-// Define class/function name
 if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 	UPTIME.ElementStatusBarChart = function(options, displayStatusBar, clearStatusBar) {
-		var chartTimer = null;
-
 		Highcharts.setOptions({
 			global : {
 				useUTC : false
@@ -17,18 +14,26 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 		var elementId = null;
 		var elementName = null;
 		var chartType = null;
+		var refreshInterval = 30;
+		var chartTimer = null;
 		var api = new apiQueries();
-		var refreshRate = null;
+
+		var textStyle = {
+			fontFamily : "Verdana, Arial, Helvetica, sans-serif",
+			fontSize : "9px",
+			lineHeight : "11px",
+			color : "#565E6C"
+		};
 
 		if (typeof options == "object") {
 			chartDivId = options.chartDivId;
-			chartType = options.chartTypeId;
+			chartType = options.chartType;
 			elementId = options.elementId;
 			elementName = options.elementName;
-			refreshRate = options.refreshRate;
+			refreshInterval = options.refreshInterval;
 		}
 
-		var statusData = [ {
+		var seriesData = [ {
 			id : 'OK',
 			name : 'OK',
 			data : [ 0 ],
@@ -54,37 +59,38 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			data : [ 0 ],
 			color : '#AEAEAE'
 		} ];
-		var chart;
 
-		chart = new Highcharts.Chart({
-			credits : {
-				enabled : false
-			},
+		var chart = new Highcharts.Chart({
 			chart : {
 				renderTo : chartDivId,
 				height : 200,
 				type : chartType,
-				events : {
-					load : updateChart
-				},
+				animation : true,
+				style : textStyle
+			},
+			credits : {
+				enabled : false
 			},
 			plotOptions : {
 				series : {
-					pointWidth : 20
+					pointWidth : 20,
+					animation : true
 				}
 			},
 			title : {
-				text : "<a href='/main.php?section=Profile&subsection=&id=" + elementId + "&name=" + elementName
-						+ "&dlsection=s_status' target='_top'>" + elementName,
-				style : {
-					fontSize : '10px'
-				}
+				text : '<a href="' + uptimeGadget.getElementUrls(elementId, elementName).services + '" target="_top">'
+						+ elementName + '</a>',
+				y : 5,
+				style : $.extend({
+					fontWeight : "bold"
+				}, textStyle),
+				useHTML : true
 			},
 			subtitle : {
 				text : "Monitor Status",
-				style : {
-					fontSize : '8px'
-				}
+				y : 20,
+				style : textStyle,
+				useHTML : true
 			},
 			xAxis : {
 				labels : {
@@ -92,17 +98,17 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				}
 			},
 			yAxis : {
+				labels : {
+					style : textStyle,
+				},
 				allowDecimals : false,
 				min : 0,
 				title : {
 					text : ''
 				}
 			},
-			legend : {
-				enabled : false,
-				floating : false
-			},
 			tooltip : {
+				style : textStyle,
 				formatter : function() {
 					var plural = "";
 					if (this.y > 1) {
@@ -111,59 +117,61 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 					return '<b>' + this.series.name + '</b> - ' + this.y + " monitor" + plural;
 				}
 			},
-			series : statusData
+			legend : {
+				enabled : false
+			},
+			series : seriesData,
+			spacingTop : 5,
+			spacingRight : 5,
+			spacingBottom : 5,
+			spacingLeft : 5
 		});
 
-		function updateChart() {
+		function requestData() {
 			api.getElementStatus(elementId).then(function(fullData) {
-
 				var allMonitorsStatus = fullData['monitorStatus'];
-				var statusTally = {};
+				var statusCount = {};
 				for ( var index in allMonitorsStatus) {
 					var monitor = allMonitorsStatus[index];
 					var monitorStatus = monitor["status"];
 					if ((monitor.isMonitored) && !(monitor.isHidden)) {
-						if (!statusTally.hasOwnProperty(monitorStatus)) {
-							statusTally[monitorStatus] = 0;
+						if (!statusCount.hasOwnProperty(monitorStatus)) {
+							statusCount[monitorStatus] = 0;
 						}
-						statusTally[monitorStatus]++;
+						statusCount[monitorStatus]++;
 					}
 				}
-
 				var displayStatuses = [ "OK", "WARN", "CRIT", "UNKNOWN", "MAINT" ];
-
-				$.each(displayStatuses, function(index, statusName) {
-					var bar = chart.get(statusName);
-					if (statusTally.hasOwnProperty(statusName)) {
+				$.each(displayStatuses, function(index, severity) {
+					var bar = chart.get(severity);
+					if (statusCount.hasOwnProperty(severity)) {
 						bar.show();
-						bar.setData([ statusTally[statusName] ]);
+						bar.setData([ statusCount[severity] ]);
 					} else {
 						bar.hide();
 					}
 				});
-
 				clearStatusBar();
 				chart.hideLoading();
 			}, function(error) {
 				chart.hideLoading();
 				displayStatusBar(error, "Error Loading Chart Data");
 			});
-			// set chart refresh to update itself automatically
-			if (refreshRate > 0) {
-				chartTimer = setTimeout(updateChart, refreshRate * 1000);
+			if (refreshInterval > 0) {
+				chartTimer = setTimeout(requestData, refreshInterval * 1000);
 			}
 		}
 
 		// public functions for this function/class
 		var publicFns = {
+			render : function() {
+				chart.showLoading();
+				requestData();
+			},
 			stopTimer : function() {
 				if (chartTimer) {
 					window.clearTimeout(chartTimer);
 				}
-			},
-			render : function() {
-				chart.showLoading();
-				updateChart();
 			},
 			destroy : function() {
 				chart.destroy();

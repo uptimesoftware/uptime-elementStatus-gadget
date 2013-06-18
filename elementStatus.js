@@ -3,9 +3,9 @@ $(function() {
 	var myChart = null;
 	var elementStatusSettings = {
 		entityId : -1,
-		chartTypeId : "pieChartType",
 		entityName : "",
 		refreshInterval : 30,
+		chartTypeId : "pie",
 	};
 	var divsToDim = [ '#widgetChart', '#widgetSettings' ];
 
@@ -172,7 +172,7 @@ $(function() {
 		} else {
 			myChart = new UPTIME.ElementStatusBarChart({
 				chartDivId : "widgetChart",
-				chartTypeId : chartType,
+				chartType : chartType,
 				elementId : elementId,
 				elementName : elementName,
 				refreshInterval : refreshInterval
