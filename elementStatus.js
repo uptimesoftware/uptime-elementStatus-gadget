@@ -1,6 +1,7 @@
 $(function() {
 	var api = new apiQueries();
 	var myChart = null;
+	var myChartDimensions = null;
 	var elementStatusSettings = {
 		entityId : -1,
 		entityName : "",
@@ -18,13 +19,26 @@ $(function() {
 	});
 
 	uptimeGadget.registerOnEditHandler(showEditPanel);
-	uptimeGadget.registerOnLoadHandler(function() {
-		uptimeGadget.loadSettings().then(goodLoad, onBadAjax);
+	uptimeGadget.registerOnLoadHandler(function(onLoadData) {
+		myChartDimensions = toMyChartDimensions(onLoadData.dimensions);
+		if (onLoadData.hasPreloadedSettings()) {
+			goodLoad(onLoadData.settings);
+		} else {
+			uptimeGadget.loadSettings().then(goodLoad, onBadAjax);
+		}
 	});
 	uptimeGadget.registerOnResizeHandler(resizeGadget);
 
-	function resizeGadget() {
+	function resizeGadget(dimensions) {
+		myChartDimensions = toMyChartDimensions(dimensions);
+		if (myChart) {
+			myChart.resize(myChartDimensions);
+		}
 		$("body").height($(window).height());
+	}
+	
+	function toMyChartDimensions(dimensions) {
+		return new UPTIME.pub.gadgets.Dimensions(Math.max(200, dimensions.width - 5), Math.max(200, dimensions.height - 5));
 	}
 
 	function settingChanged() {
@@ -61,7 +75,7 @@ $(function() {
 		$("#refreshRate").val(elementStatusSettings.refreshInterval);
 
 		$("#widgetSettings").slideDown();
-		resizeGadget();
+		$("body").height($(window).height());
 		return populateIdSelector().then(function() {
 			settingChanged();
 		});
@@ -80,7 +94,7 @@ $(function() {
 	function displayPanel(settings) {
 		$("#widgetChart").show();
 		displayChart(settings.chartTypeId, settings.elementId, settings.elementName, settings.refreshInterval);
-		resizeGadget();
+		$("body").height($(window).height());
 	}
 
 	function elementSort(arg1, arg2) {
@@ -163,6 +177,7 @@ $(function() {
 
 		if (chartType == "pie") {
 			myChart = new UPTIME.ElementStatusPieChart({
+				dimensions : myChartDimensions,
 				chartDivId : "widgetChart",
 				chartType : chartType,
 				elementId : elementId,
@@ -171,6 +186,7 @@ $(function() {
 			}, displayStatusBar, clearStatusBar);
 		} else {
 			myChart = new UPTIME.ElementStatusBarChart({
+				dimensions : myChartDimensions,
 				chartDivId : "widgetChart",
 				chartType : chartType,
 				elementId : elementId,

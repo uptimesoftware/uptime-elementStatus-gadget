@@ -10,6 +10,7 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 			}
 		});
 
+		var dimensions = new UPTIME.pub.gadgets.Dimensions(200, 200);
 		var chartDivId = null;
 		var elementId = null;
 		var elementName = null;
@@ -62,6 +63,7 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 		};
 
 		if (typeof options == "object") {
+			dimensions = options.dimensions;
 			chartDivId = options.chartDivId;
 			elementId = options.elementId;
 			elementName = options.elementName;
@@ -72,7 +74,8 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 		var chart = new Highcharts.Chart({
 			chart : {
 				renderTo : chartDivId,
-				height : 200,
+				width : dimensions.width,
+				height : dimensions.height,
 				plotBackgroundColor : null,
 				plotBorderWidth : null,
 				plotShadow : false,
@@ -185,6 +188,9 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 			render : function() {
 				chart.showLoading();
 				requestData();
+			},
+			resize : function(newDimensions) {
+				chart.setSize(newDimensions.width, newDimensions.height);
 			},
 			stopTimer : function() {
 				if (chartTimer) {
