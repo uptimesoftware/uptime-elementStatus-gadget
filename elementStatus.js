@@ -13,7 +13,7 @@ $(function() {
 
 	$('.element-status-setting').change(settingChanged);
 
-	$("#closeSettings").button().click(function() {
+	$("#closeSettings").click(function() {
 		$("#widgetSettings").slideUp();
 	});
 

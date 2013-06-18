@@ -12,10 +12,10 @@
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-		<title>Current Element Status</title>
+		<title>Element Status Chart</title>
 		<link href="__UPTIME_GADGET_BASE__/elementStatus.css" type="text/css" rel="stylesheet" />
 
-		#includeResources(jquery,jqueryui,highcharts)
+		#includeResources(jquery,highcharts)
 		
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/apiQueries.js"></script>
 		<script type="text/javascript" src="__UPTIME_GADGET_BASE__/uptimeElementStatusBarChart.js"></script>
@@ -57,7 +57,7 @@
 						<option value="-1">Never</option>
 					</select>
 				<br/><br/>
-				<input id="closeSettings" type="button" value="Close"/>
+				<button id="closeSettings">Close</button>
 			</form>
 		</div>
 
