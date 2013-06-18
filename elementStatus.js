@@ -167,8 +167,7 @@ $(function() {
 				chartType : chartType,
 				elementId : elementId,
 				elementName : elementName,
-				refreshInterval : refreshInterval,
-				statusBarDivId : "statusBar"
+				refreshInterval : refreshInterval
 			}, displayStatusBar, clearStatusBar);
 		} else {
 			myChart = new UPTIME.ElementStatusBarChart({
@@ -176,8 +175,7 @@ $(function() {
 				chartTypeId : chartType,
 				elementId : elementId,
 				elementName : elementName,
-				refreshInterval : refreshInterval,
-				statusBarDivId : "statusBar"
+				refreshInterval : refreshInterval
 			}, displayStatusBar, clearStatusBar);
 		}
 		myChart.render();
