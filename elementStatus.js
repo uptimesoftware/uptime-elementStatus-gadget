@@ -29,6 +29,10 @@ $(function() {
 	});
 	uptimeGadget.registerOnResizeHandler(resizeGadget);
 
+	function escapeHtml(str) {
+		return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	}
+
 	function resizeGadget(dimensions) {
 		myChartDimensions = toMyChartDimensions(dimensions);
 		if (myChart) {
@@ -36,7 +40,7 @@ $(function() {
 		}
 		$("body").height($(window).height());
 	}
-	
+
 	function toMyChartDimensions(dimensions) {
 		return new UPTIME.pub.gadgets.Dimensions(Math.max(100, dimensions.width - 5), Math.max(100, dimensions.height - 5));
 	}
@@ -134,7 +138,7 @@ $(function() {
 			$.extend(elementStatusSettings, settings);
 
 			displayPanel(settings);
-		} else {
+		} else if (uptimeGadget.isOwner()) {
 			$('#widgetChart').hide();
 			showEditPanel();
 		}
