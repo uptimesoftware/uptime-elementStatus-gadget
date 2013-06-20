@@ -84,6 +84,8 @@ $(function() {
 			if (!myChart) {
 				settingChanged();
 			}
+		}, function(error) {
+			displayStatusBar(error, "Error Loading the List of Elements from up.time Controller");
 		});
 	}
 
@@ -119,8 +121,6 @@ $(function() {
 			if (elementStatusSettings.elementId >= 0) {
 				elementSelector.val(elementStatusSettings.elementId);
 			}
-		}, function(error) {
-			displayStatusBar(error, "Error Loading the List of Elements from up.time Controller");
 		});
 	}
 
