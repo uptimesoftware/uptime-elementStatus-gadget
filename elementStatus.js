@@ -81,7 +81,9 @@ $(function() {
 		$("#widgetSettings").slideDown();
 		$("body").height($(window).height());
 		return populateIdSelector().then(function() {
-			settingChanged();
+			if (!myChart) {
+				settingChanged();
+			}
 		});
 	}
 
@@ -93,12 +95,6 @@ $(function() {
 	function enableSettings() {
 		$('.element-status-setting').prop('disabled', false);
 		$('#closeButton').prop('disabled', false).removeClass("ui-state-disabled");
-	}
-
-	function displayPanel(settings) {
-		$("#widgetChart").show();
-		displayChart(settings.chartTypeId, settings.elementId, settings.elementName, settings.refreshInterval);
-		$("body").height($(window).height());
 	}
 
 	function elementSort(arg1, arg2) {
@@ -131,23 +127,17 @@ $(function() {
 	function goodLoad(settings) {
 		clearStatusBar();
 		if (settings) {
-			// update hidden edit panel with settings
-			$("#elementId").val(settings.elementId);
-			$("#" + settings.chartTypeId).prop("checked", true);
-			$("#refreshRate").val(settings.refreshInterval);
 			$.extend(elementStatusSettings, settings);
-
-			displayPanel(settings);
+			displayChart();
 		} else if (uptimeGadget.isOwner()) {
 			$('#widgetChart').hide();
 			showEditPanel();
 		}
-
 	}
 
-	function onGoodSave(savedSettings) {
+	function onGoodSave() {
 		clearStatusBar();
-		displayPanel(savedSettings);
+		displayChart();
 	}
 
 	function onBadAjax(error) {
@@ -172,33 +162,35 @@ $(function() {
 		});
 	}
 
-	function displayChart(chartType, elementId, elementName, refreshInterval) {
+	function displayChart() {
 		if (myChart) {
 			myChart.stopTimer();
 			myChart.destroy();
 			myChart = null;
 		}
+		$("#widgetChart").show();
 
-		if (chartType == "pie") {
+		if (elementStatusSettings.chartTypeId == "pie") {
 			myChart = new UPTIME.ElementStatusPieChart({
 				dimensions : myChartDimensions,
 				chartDivId : "widgetChart",
-				chartType : chartType,
-				elementId : elementId,
-				elementName : elementName,
-				refreshInterval : refreshInterval
+				chartType : elementStatusSettings.chartTypeId,
+				elementId : elementStatusSettings.elementId,
+				elementName : elementStatusSettings.elementName,
+				refreshInterval : elementStatusSettings.refreshInterval
 			}, displayStatusBar, clearStatusBar);
 		} else {
 			myChart = new UPTIME.ElementStatusBarChart({
 				dimensions : myChartDimensions,
 				chartDivId : "widgetChart",
-				chartType : chartType,
-				elementId : elementId,
-				elementName : elementName,
-				refreshInterval : refreshInterval
+				chartType : elementStatusSettings.chartTypeId,
+				elementId : elementStatusSettings.elementId,
+				elementName : elementStatusSettings.elementName,
+				refreshInterval : elementStatusSettings.refreshInterval
 			}, displayStatusBar, clearStatusBar);
 		}
 		myChart.render();
+		$("body").height($(window).height());
 	}
 
 });
