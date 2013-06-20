@@ -29,10 +29,6 @@ $(function() {
 	});
 	uptimeGadget.registerOnResizeHandler(resizeGadget);
 
-	function escapeHtml(str) {
-		return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-	}
-
 	function resizeGadget(dimensions) {
 		myChartDimensions = toMyChartDimensions(dimensions);
 		if (myChart) {
@@ -127,6 +123,10 @@ $(function() {
 	function goodLoad(settings) {
 		clearStatusBar();
 		if (settings) {
+			// update hidden edit panel with settings
+			$("#elementId").val(settings.elementId);
+			$("#" + settings.chartTypeId).prop("checked", true);
+			$("#refreshRate").val(settings.refreshInterval);
 			$.extend(elementStatusSettings, settings);
 			displayChart();
 		} else if (uptimeGadget.isOwner()) {
