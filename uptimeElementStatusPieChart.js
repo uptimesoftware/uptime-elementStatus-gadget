@@ -13,7 +13,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 		var dimensions = new UPTIME.pub.gadgets.Dimensions(100, 100);
 		var chartDivId = null;
 		var elementId = null;
-		var elementName = null;
 		var refreshInterval = 30;
 		var chartTimer = null;
 		var api = new apiQueries();
@@ -66,7 +65,6 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 			dimensions = options.dimensions;
 			chartDivId = options.chartDivId;
 			elementId = options.elementId;
-			elementName = options.elementName;
 			refreshInterval = options.refreshInterval;
 		}
 
@@ -87,9 +85,18 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 			credits : {
 				enabled : false
 			},
+			tooltip : {
+				style : textStyle,
+				formatter : function() {
+					if (dataLabelsEnabled) {
+						return '<b>' + this.point.name + '</b> - ' + monitorCount(this.y);
+					} else {
+						return '';
+					}
+				}
+			},
 			title : {
-				text : '<a href="' + uptimeGadget.getElementUrls(elementId, elementName).services + '" target="_top">'
-						+ elementName + '</a>',
+				text : '&nbsp;',
 				margin : 0,
 				y : 5,
 				style : $.extend({
@@ -98,20 +105,10 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 				useHTML : true
 			},
 			subtitle : {
-				text : "Monitor Status",
+				text : '&nbsp;',
 				y : 20,
 				style : textStyle,
 				useHTML : true
-			},
-			tooltip : {
-				style : textStyle,
-				formatter : function() {
-					var plural = "";
-					if (this.y > 1) {
-						plural = "s";
-					}
-					return '<b>' + this.point.name + '</b> - ' + this.y + " monitor" + plural;
-				}
 			},
 			legend : {
 				enabled : false
@@ -148,37 +145,45 @@ if (typeof UPTIME.ElementStatusPieChart == "undefined") {
 		});
 
 		function requestData() {
-			var statusCount = {
-				'OK' : 0,
-				'WARN' : 0,
-				'CRIT' : 0,
-				'UNKNOWN' : 0,
-				'MAINT' : 0
-			};
-			api.getElementStatus(elementId).then(function(fullData) {
-				$.each(fullData.monitorStatus, function(index, monitor) {
-					if ((monitor.isMonitored) && !(monitor.isHidden)) {
-						statusCount[monitor.status]++;
-					}
-				});
-				$.each(seriesData, function(i, item) {
-					var sliceData = statusCount[item.id];
-					item.y = 0;
-					if (sliceData) {
-						item.y = sliceData;
-						item.visible = true;
-					} else {
-						item.visible = false;
-					}
-				});
-				clearStatusBar();
-				dataLabelsEnabled = true;
-				chart.series[0].setData(seriesData, true);
-				chart.hideLoading();
-			}, function(error) {
-				chart.hideLoading();
-				displayStatusBar(error, "Error Loading Chart Data");
-			});
+			api.getElementStatus(elementId).then(
+					function(result) {
+						var statusCount = {
+							'OK' : 0,
+							'WARN' : 0,
+							'CRIT' : 0,
+							'UNKNOWN' : 0,
+							'MAINT' : 0
+						};
+						var total = 0;
+						$.each(result.monitorStatus, function(index, monitor) {
+							if (monitor.isMonitored && !monitor.isHidden) {
+								statusCount[monitor.status]++;
+								total++;
+							}
+						});
+						chart.setTitle({
+							text : '<a href="' + uptimeGadget.getElementUrls(result.id, result.name).services
+									+ '" target="_top">' + escapeHtml(result.name) + '</a>',
+						}, {
+							text : monitorCount(total),
+						});
+						$.each(seriesData, function(i, item) {
+							var count = statusCount[item.id];
+							item.y = count;
+							if (count) {
+								item.visible = true;
+							} else {
+								item.visible = false;
+							}
+						});
+						clearStatusBar();
+						dataLabelsEnabled = true;
+						chart.series[0].setData(seriesData, true);
+						chart.hideLoading();
+					}, function(error) {
+						chart.hideLoading();
+						displayStatusBar(error, "Error Loading Chart Data");
+					});
 			if (refreshInterval > 0) {
 				chartTimer = setTimeout(requestData, refreshInterval * 1000);
 			}

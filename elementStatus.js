@@ -4,7 +4,6 @@ $(function() {
 	var myChartDimensions = null;
 	var elementStatusSettings = {
 		entityId : -1,
-		entityName : "",
 		refreshInterval : 30,
 		chartTypeId : "pie",
 	};
@@ -28,6 +27,19 @@ $(function() {
 		}
 	});
 	uptimeGadget.registerOnResizeHandler(resizeGadget);
+
+	escapeHtml = function(str) {
+		return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	};
+
+	monitorCount = function(count) {
+		if (count == 0) {
+			return "No monitors";
+		} else if (count == 1) {
+			return "1 monitor";
+		}
+		return count + " monitors";
+	};
 
 	function resizeGadget(dimensions) {
 		myChartDimensions = toMyChartDimensions(dimensions);
@@ -123,7 +135,6 @@ $(function() {
 	function goodLoad(settings) {
 		clearStatusBar();
 		if (settings) {
-			// update hidden edit panel with settings
 			$("#elementId").val(settings.elementId);
 			$("#" + settings.chartTypeId).prop("checked", true);
 			$("#refreshRate").val(settings.refreshInterval);
@@ -176,7 +187,6 @@ $(function() {
 				chartDivId : "widgetChart",
 				chartType : elementStatusSettings.chartTypeId,
 				elementId : elementStatusSettings.elementId,
-				elementName : elementStatusSettings.elementName,
 				refreshInterval : elementStatusSettings.refreshInterval
 			}, displayStatusBar, clearStatusBar);
 		} else {
@@ -185,7 +195,6 @@ $(function() {
 				chartDivId : "widgetChart",
 				chartType : elementStatusSettings.chartTypeId,
 				elementId : elementStatusSettings.elementId,
-				elementName : elementStatusSettings.elementName,
 				refreshInterval : elementStatusSettings.refreshInterval
 			}, displayStatusBar, clearStatusBar);
 		}

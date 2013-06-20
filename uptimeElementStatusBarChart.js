@@ -13,7 +13,6 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 		var dimensions = new UPTIME.pub.gadgets.Dimensions(100, 100);
 		var chartDivId = null;
 		var elementId = null;
-		var elementName = null;
 		var chartType = null;
 		var refreshInterval = 30;
 		var chartTimer = null;
@@ -31,7 +30,6 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			chartDivId = options.chartDivId;
 			chartType = options.chartType;
 			elementId = options.elementId;
-			elementName = options.elementName;
 			refreshInterval = options.refreshInterval;
 		}
 
@@ -62,6 +60,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			color : '#AEAEAE'
 		} ];
 
+		var dataLabelsEnabled = false;
 		var chart = new Highcharts.Chart({
 			chart : {
 				renderTo : chartDivId,
@@ -81,8 +80,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				}
 			},
 			title : {
-				text : '<a href="' + uptimeGadget.getElementUrls(elementId, elementName).services + '" target="_top">'
-						+ elementName + '</a>',
+				text : '&nbsp;',
 				y : 5,
 				style : $.extend({
 					fontWeight : "bold"
@@ -90,7 +88,7 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 				useHTML : true
 			},
 			subtitle : {
-				text : "Monitor Status",
+				text : '&nbsp;',
 				y : 20,
 				style : textStyle,
 				useHTML : true
@@ -113,11 +111,11 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 			tooltip : {
 				style : textStyle,
 				formatter : function() {
-					var plural = "";
-					if (this.y > 1) {
-						plural = "s";
+					if (dataLabelsEnabled) {
+						return '<b>' + this.series.name + '</b> - ' + monitorCount(this.y);
+					} else {
+						return '';
 					}
-					return '<b>' + this.series.name + '</b> - ' + this.y + " monitor" + plural;
 				}
 			},
 			legend : {
@@ -131,35 +129,44 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 		});
 
 		function requestData() {
-			api.getElementStatus(elementId).then(function(fullData) {
-				var allMonitorsStatus = fullData['monitorStatus'];
-				var statusCount = {};
-				for ( var index in allMonitorsStatus) {
-					var monitor = allMonitorsStatus[index];
-					var monitorStatus = monitor["status"];
-					if ((monitor.isMonitored) && !(monitor.isHidden)) {
-						if (!statusCount.hasOwnProperty(monitorStatus)) {
-							statusCount[monitorStatus] = 0;
-						}
-						statusCount[monitorStatus]++;
-					}
-				}
-				var displayStatuses = [ "OK", "WARN", "CRIT", "UNKNOWN", "MAINT" ];
-				$.each(displayStatuses, function(index, severity) {
-					var bar = chart.get(severity);
-					if (statusCount.hasOwnProperty(severity)) {
-						bar.show();
-						bar.setData([ statusCount[severity] ]);
-					} else {
-						bar.hide();
-					}
-				});
-				clearStatusBar();
-				chart.hideLoading();
-			}, function(error) {
-				chart.hideLoading();
-				displayStatusBar(error, "Error Loading Chart Data");
-			});
+			api.getElementStatus(elementId).then(
+					function(result) {
+						var statusCount = {
+							'OK' : 0,
+							'WARN' : 0,
+							'CRIT' : 0,
+							'UNKNOWN' : 0,
+							'MAINT' : 0
+						};
+						var total = 0;
+						$.each(result.monitorStatus, function(index, monitor) {
+							if (monitor.isMonitored && !monitor.isHidden) {
+								statusCount[monitor.status]++;
+								total++;
+							}
+						});
+						chart.setTitle({
+							text : '<a href="' + uptimeGadget.getElementUrls(result.id, result.name).services
+									+ '" target="_top">' + escapeHtml(result.name) + '</a>',
+						}, {
+							text : monitorCount(total),
+						});
+						$.each(statusCount, function(status, count) {
+							var bar = chart.get(status);
+							bar.setData([ count ]);
+							if (count > 0) {
+								bar.show();
+							} else {
+								bar.hide();
+							}
+						});
+						clearStatusBar();
+						dataLabelsEnabled = true;
+						chart.hideLoading();
+					}, function(error) {
+						chart.hideLoading();
+						displayStatusBar(error, "Error Loading Chart Data");
+					});
 			if (refreshInterval > 0) {
 				chartTimer = setTimeout(requestData, refreshInterval * 1000);
 			}
