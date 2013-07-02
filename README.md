@@ -1,6 +1,6 @@
 # Element Status Chart gadget
 
-> up.time gadget which charts the status of an element.
+> Use this gadget to display the service monitor status in a pie or bar chart format for a single element.
 
 ## Getting Started
 This gadget is built using Grunt `~0.4.1`.

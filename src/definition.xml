@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
 	<ModulePrefs title="Element Status Chart"
-		description="Chart the monitor status for an element."
+		description="Use this gadget to display the service monitor status in a pie or bar chart format for a single element."
 		thumbnail="elementStatusThm.png">
 		<Require feature="dynamic-height" />
 	</ModulePrefs>
