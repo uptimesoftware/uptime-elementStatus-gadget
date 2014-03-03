@@ -131,6 +131,11 @@ if (typeof UPTIME.ElementStatusBarChart == "undefined") {
 		function requestData() {
 			api.getElementStatus(elementId).then(
 					function(result) {
+						if (!result.isMonitored) {
+							chart.hideLoading();
+							displayStatusBar("No visible elements to monitor", "Error Loading Chart Data");						
+							return;
+						}						
 						var statusCount = {
 							'OK' : 0,
 							'WARN' : 0,
