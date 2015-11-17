@@ -1,6 +1,6 @@
 {
 	"name": "uptime.ElementStatusChart",
-	"version": "1.2.0-SNAPSHOT",
+	"version": "1.2.0",
 	"description": "Use this gadget to display the service monitor status in a pie or bar chart format for a single element.",
 	"main": "src/elementStatus.js",
 	"repository": {
