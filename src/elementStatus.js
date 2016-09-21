@@ -93,7 +93,7 @@ $(function() {
 				settingChanged();
 			}
 		}, function(error) {
-			displayStatusBar(error, "Error Loading the List of Elements from up.time Controller");
+			displayStatusBar(error, "Error Loading the List of Elements from Uptime Controller");
 		});
 	}
 
@@ -152,7 +152,7 @@ $(function() {
 	}
 
 	function onBadAjax(error) {
-		displayStatusBar(error, "Error Communicating with up.time");
+		displayStatusBar(error, "Error Communicating with Uptime");
 	}
 
 	function gadgetDimOn() {
